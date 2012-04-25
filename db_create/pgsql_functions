@@ -1,0 +1,29 @@
+#!/bin/bash
+
+export PGPASSFILE=/etc/.pgsql.secret
+export PGHOST=panzer.ares
+export PGUSER=remote_postgres
+
+# For the interface
+HOST_DB=`echo $PGHOST`
+
+if [ -f "$PGPASSFILE" ]
+then
+  export PGPASSWORD=`cat "$PGPASSFILE"`
+else
+  echo "Unable to find $PGPASSFILE"
+  exit 1
+fi
+
+list_db()
+{
+  echo "\l" | psql | tr -s ' ' | grep -E "^ [a-z]" | cut -d' ' -f2
+}
+
+create_db()
+{
+  psql <<EOF
+CREATE ROLE $1 WITH LOGIN ENCRYPTED PASSWORD '$2';
+CREATE DATABASE $1 WITH OWNER $1;
+EOF
+}

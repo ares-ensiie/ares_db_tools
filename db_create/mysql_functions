@@ -1,0 +1,28 @@
+#!/bin/bash
+
+MYSQL_SERVER=bertha.ares
+MYSQL_PASSFILE=/etc/.mysql.secret
+
+# for the interface
+HOST_DB=$MYSQL_SERVER
+
+if [ -f "$MYSQL_PASSFILE" ]
+then
+  mysql_password=`cat "$MYSQL_PASSFILE"`
+else
+  echo "Unable to find $MYSQL_PASSFILE"
+  exit 1
+fi
+
+list_db()
+{
+  echo "SHOW DATABASES" | mysql --user=root --password="$mysql_password"
+}
+
+create_db()
+{
+  mysql --user=root --password="$mysql_password" <<EOF
+CREATE DATABASE $1;
+GRANT ALL PRIVILEGES ON $1.* TO '$1'@'%' IDENTIFIED BY '$2';
+EOF
+}

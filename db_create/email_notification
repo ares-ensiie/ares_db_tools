@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# $1 : Database / Username
+# $2 : User email
+# $3 : User password
+# $4 : DB type
+# $5 : DB Host Server
+
+send_email()
+{
+  subject=`echo "Création de base de données $4" | openssl enc -base64`
+  subject=`echo "=?UTF-8?B?$subject?="`
+
+  cat > mail.tmp <<EOF
+To: $2
+Content-Type:  text/plain; charset=UTF-8
+Subject: $subject
+
+Salut !
+
+Une base de donnée a été ouvert pour ton utilisation.
+
+Serveur : $5
+Base de donnée : $1
+Utilisateur : $1
+Mot de passe : $3
+
+Tu pourras trouver des informations sur notre wiki : http://wiki.ares-ensiie.eu
+
+Profites-en bien. Pour tout question ou problème, rendez vous sur http://bug.ares-ensiie.eu
+
+--
+L'équipe ARES
+EOF
+ 
+  cat mail.tmp | /usr/sbin/sendmail -F "Contact ARES" -f "contact@ares-ensiie.eu" $2
+  rm mail.tmp
+}
+
